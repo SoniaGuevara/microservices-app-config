@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shippingservice
+  labels:
+    app: shippingservice
+spec:
+  selector:
+    matchLabels:
+      app: shippingservice
+  template:
+    metadata:
+      labels:
+        app: shippingservice
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+    spec:
+      serviceAccountName: shippingservice
+      containers:
+        - name: server
+          image: us-central1-docker.pkg.dev/google-samples/microservices-demo/shippingservice:v0.10.2
+          ports:
+          - containerPort: 50051
+          readinessProbe:
+            grpc:
+              port: 50051
+            initialDelaySeconds: 20
+          livenessProbe:
+            grpc:
+              port: 50051
+            initialDelaySeconds: 20
+          env:
+          - name: PORT
+            value: "50051"
+          - name: DISABLE_PROFILER
+            value: "1"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

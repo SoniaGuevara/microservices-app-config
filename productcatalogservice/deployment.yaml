@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productcatalogservice
+  labels:
+    app: productcatalogservice
+spec:
+  selector:
+    matchLabels:
+      app: productcatalogservice
+  template:
+    metadata:
+      labels:
+        app: productcatalogservice
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+    spec:
+      serviceAccountName: productcatalogservice
+      containers:
+        - name: server
+          image: us-central1-docker.pkg.dev/google-samples/microservices-demo/productcatalogservice:v0.10.2
+          ports:
+          - containerPort: 3550
+          readinessProbe:
+            grpc:
+              port: 3550
+            initialDelaySeconds: 20
+          livenessProbe:
+            grpc:
+              port: 3550
+            initialDelaySeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
