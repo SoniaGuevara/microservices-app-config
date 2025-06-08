@@ -32,9 +32,9 @@ spec:
         image: us-central1-docker.pkg.dev/google-samples/microservices-demo/adservice:v0.10.2
         ports:
         - containerPort: 9555
-        env:
-        - name: PORT
-          value: "9555"
+        envFrom:
+          - configMapRef:
+              name: adservice-config
         resources:
           requests:
             cpu: 200m
